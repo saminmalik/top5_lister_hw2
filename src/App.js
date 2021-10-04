@@ -104,6 +104,28 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+    renameItem = (key, newName) => {
+        let itemS = this.state.currentList.items;
+        itemS[key] = newName;
+        /*for (let i = 0; i < itemS.length; i++) {
+            if (i===key){
+                console.log("ItemCard handleBlur123: " + key + itemS[i] );
+                itemS[i] = newName;
+            }
+        }*/
+        //
+        this.setState(prevState => ({
+            //currentList: prevState.currentList,
+                currentList: prevState.currentList,
+                sessionData: prevState.sessionData
+        }), () => {
+            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+            // THE TRANSACTION STACK IS CLEARED
+            this.db.mutationUpdateList(this.state.currentList); // updates the local storage
+            
+        });
+
+    }   
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
@@ -150,19 +172,21 @@ class App extends React.Component {
                     closeCallback={this.closeCurrentList} />
                 <Sidebar
                     heading='Your Lists'
-                    currentList={this.state.currentList}
-                    keyNamePairs={this.state.sessionData.keyNamePairs}
+                    currentList={this.state.currentList} 
+                    keyNamePairs = {this.state.sessionData.keyNamePairs}
                     createNewListCallback={this.createNewList}
                     deleteListCallback={this.deleteList}
                     loadListCallback={this.loadList}
                     renameListCallback={this.renameList}
                 />
                 <Workspace
-                    currentList={this.state.currentList} />
+                    currentList={this.state.currentList} 
+                    renameItemCallback={this.renameItem}/> 
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
                     hideDeleteListModalCallback={this.hideDeleteListModal}
+                    listKeyPair={this.state.currentList}
                 />
             </div>
         );
