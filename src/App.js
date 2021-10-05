@@ -232,13 +232,26 @@ class App extends React.Component {
     canClose = () => {
         return this.state.currentList!=null;
     }
+    hasUndo = () => {
+        return this.tps.hasTransactionToUndo();
+    }
+    hasRedo = () => {
+        return this.tps.hasTransactionToRedo();
+    }
+    canClose = () => {
+        return this.state.currentList!=null;
+    }
     
     render() {
         return (
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
-                    closeCallback={this.closeCurrentList} 
+                    closeCallback={this.closeCurrentList}
+                    undoCallback={this.undo}
+                    redoCallback = {this.redo}
+                    hasUndoCallback = {this.hasUndo}
+                    hasRedoCallback = {this.hasRedo}
                     canCloseCallback = {this.canClose}
                     />
                 <Sidebar

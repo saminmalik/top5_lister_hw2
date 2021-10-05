@@ -38,6 +38,7 @@ export default class ItemCard extends React.Component {
 
     handledragstart = (event) =>{
         event.dataTransfer.setData("text",event.target.id);
+        console.log(`DRAG-START: ${this.props.currentList} ${event.target.id}`);
     }
     handledragover = (event) =>{
         event.preventDefault();
@@ -54,6 +55,7 @@ export default class ItemCard extends React.Component {
     }
     handledragleave = (event) =>{
         this.setState({className:"top5-item"});
+        console.log(`DRAG-STOP: ${this.props.currentList} ${event.target.id}`);
     }
 
 

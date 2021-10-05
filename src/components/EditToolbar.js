@@ -7,12 +7,14 @@ export default class EditToolbar extends React.Component {
             <div id="edit-toolbar">
                 <div 
                     id='undo-button' 
-                    className="top5-button">
+                    className={`top5-button ${this.props.hasUndoCallback() ? "" : "disabled"} `}
+                    onClick={this.props.undoCallback}>
                         &#x21B6;
                 </div>
                 <div
                     id='redo-button'
-                    className="top5-button">
+                    className={`top5-button ${this.props.hasRedoCallback() ? "" : "disabled"} `}
+                    onClick={this.props.redoCallback}>
                         &#x21B7;
                 </div>
                 <div
