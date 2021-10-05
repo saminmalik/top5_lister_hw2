@@ -173,7 +173,7 @@ class App extends React.Component {
         let currentSession = this.state.sessionData;
         let num = 0;
 
-        this.db.queryDeleteList(key);
+        //this.db.queryDeleteList(key);
 
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
         for (let i = 0; i < newKeyNamePairs.length; i++) {
@@ -209,7 +209,7 @@ class App extends React.Component {
 
     moveItem(start,target) {
         let newCurrentList = this.state.currentList;
-        newCurrentList.items.splice(target, 0, newCurrentList.items.splice(start, 1)[0]);
+        newCurrentList.items.splice(target-1, 0, newCurrentList.items.splice(start-1, 1)[0]);
         this.setState(prevState => ({
             currentList:newCurrentList,
             sessionData:prevState.sessionData
@@ -228,6 +228,16 @@ class App extends React.Component {
     hideDeleteListModal() {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
+    }
+    undo = () => {
+        if (this.tps.hasTransactionToUndo()) {
+            this.tps.undoTransaction();
+        }
+    }
+    redo = () => {
+        if (this.tps.hasTransactionToRedo()) {
+            this.tps.doTransaction();
+        }
     }
     canClose = () => {
         return this.state.currentList!=null;

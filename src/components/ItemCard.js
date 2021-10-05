@@ -49,13 +49,15 @@ export default class ItemCard extends React.Component {
         let start = event.dataTransfer.getData("text").slice(-1);
         this.props.addMoveItemTransactionCallback(start,id);
         this.setState({className:"top5-item"});
+        document.getElementById(event.target.id).style.backgroundColor = "#e1e4cb"
     }
     handledragenter = (event) =>{
         this.setState({className:"top5-lister-dragged-to"});
+        document.getElementById(event.target.id).style.backgroundColor = "#669966"
     }
     handledragleave = (event) =>{
         this.setState({className:"top5-item"});
-        console.log(`DRAG-STOP: ${this.props.currentList} ${event.target.id}`);
+        document.getElementById(event.target.id).style.backgroundColor = "#e1e4cb"
     }
 
 
@@ -85,6 +87,7 @@ export default class ItemCard extends React.Component {
                 </div>
             );
         }*/
+        console.log("rendered ");
         if (this.state.editActive) {
             return (
                 <input
