@@ -36,6 +36,28 @@ export default class ItemCard extends React.Component {
         this.handleToggleEdit();
     }
 
+    handledragstart = (event) =>{
+        event.dataTransfer.setData("text",event.target.id);
+    }
+    handledragover = (event) =>{
+        event.preventDefault();
+    }
+    handledrop = (event) =>{
+        event.preventDefault();
+        let id = event.target.id.slice(-1);
+        let start = event.dataTransfer.getData("text").slice(-1);
+        this.props.addMoveItemTransactionCallback(start,id);
+        this.setState({className:"top5-item"});
+    }
+    handledragenter = (event) =>{
+        this.setState({className:"top5-lister-dragged-to"});
+    }
+    handledragleave = (event) =>{
+        this.setState({className:"top5-item"});
+    }
+
+
+
     render() {
 
         if (this.state.editActive) {

@@ -3,6 +3,9 @@ import './App.css';
 
 // IMPORT DATA MANAGEMENT AND TRANSACTION STUFF
 import DBManager from './db/DBManager';
+//import jsTPS from './common/jsTPS';
+//import ChangeItem_Transaction from './transactions/ChangeItem_Transaction';
+//import MoveItem_Transaction from './transactions/MoveItem_Transaction';
 
 // THESE ARE OUR REACT COMPONENTS
 import DeleteModal from './components/DeleteModal';
@@ -23,8 +26,10 @@ class App extends React.Component {
 
         // SETUP THE INITIAL STATE
         this.state = {
+            
             currentList : null,
-            sessionData : loadedSessionData
+            sessionData : loadedSessionData,
+            listKeyPairMarkedForDeletion : null
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -133,7 +138,7 @@ class App extends React.Component {
             currentList: newCurrentList,
             sessionData: prevState.sessionData
         }), () => {
-            // ANY AFTER EFFECTS?
+
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -144,15 +149,56 @@ class App extends React.Component {
             sessionData: this.state.sessionData
         }), () => {
             // ANY AFTER EFFECTS?
+            this.tps.clearAllTransactions();
+            this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
-    deleteList = () => {
+    deleteList = (keyPair) => {
         // SOMEHOW YOU ARE GOING TO HAVE TO FIGURE OUT
         // WHICH LIST IT IS THAT THE USER WANTS TO
         // DELETE AND MAKE THAT CONNECTION SO THAT THE
         // NAME PROPERLY DISPLAYS INSIDE THE MODAL
+        this.setState((state) => ({
+            currentList : this.state.currentList,
+            sessionData : this.state.sessionData,
+            listKeyPairMarkedForDeletion : keyPair
+        }));
+        // console.log(this.state.deletingListkeyPair);
         this.showDeleteListModal();
     }
+    // This funtion is used to delete a list when PRESSED confirm
+    confirmListDelete = () => {
+        let key = this.state.listKeyPairMarkedForDeletion.key;
+        let currentSession = this.state.sessionData;
+        let num = 0;
+
+        this.db.queryDeleteList(key);
+
+        let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
+        for (let i = 0; i < newKeyNamePairs.length; i++) {
+            if (newKeyNamePairs[i].key === key) {
+                num = i;
+            }
+        }
+        currentSession.keyNamePairs.splice(num, 1);
+        let list = this.state.currentList;
+
+        if (this.state.currentList != null){
+            if (this.state.currentList.key === this.state.listKeyPairMarkedForDeletion.key) {
+                list = null;
+            }
+        }
+        this.setState(prevState => ({
+            currentList : list,
+            sessionData : currentSession,
+            listKeyPairMarkedForDeletion : null
+            
+        }), () => {
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+            this.hideDeleteListModal();
+        });
+    }
+
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
     showDeleteListModal() {
@@ -164,6 +210,7 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
+    
     render() {
         return (
             <div id="app-root">
@@ -172,21 +219,23 @@ class App extends React.Component {
                     closeCallback={this.closeCurrentList} />
                 <Sidebar
                     heading='Your Lists'
-                    currentList={this.state.currentList} 
-                    keyNamePairs = {this.state.sessionData.keyNamePairs}
+                    currentList={this.state.currentList}
+                    keyNamePairs={this.state.sessionData.keyNamePairs}
                     createNewListCallback={this.createNewList}
                     deleteListCallback={this.deleteList}
                     loadListCallback={this.loadList}
                     renameListCallback={this.renameList}
                 />
                 <Workspace
-                    currentList={this.state.currentList} 
-                    renameItemCallback={this.renameItem}/> 
+                    currentList={this.state.currentList}
+                    renameItemCallback={this.renameItem}
+                    moveItemCallback={this.moveItem} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
+                    listKeyPair = {this.state.listKeyPairMarkedForDeletion}
                     hideDeleteListModalCallback={this.hideDeleteListModal}
-                    listKeyPair={this.state.currentList}
+                    confirmDelete = {this.confirmListDelete}
                 />
             </div>
         );
