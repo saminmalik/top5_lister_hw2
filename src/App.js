@@ -3,9 +3,9 @@ import './App.css';
 
 // IMPORT DATA MANAGEMENT AND TRANSACTION STUFF
 import DBManager from './db/DBManager';
-//import jsTPS from './common/jsTPS';
-//import ChangeItem_Transaction from './transactions/ChangeItem_Transaction';
-//import MoveItem_Transaction from './transactions/MoveItem_Transaction';
+import jsTPS from './transaction/jsTPS';
+import ChangeItem_Transaction from './transaction/ChangeItem_Transaction';
+import MoveItem_Transaction from './transaction/MoveItem_Transaction';
 
 // THESE ARE OUR REACT COMPONENTS
 import DeleteModal from './components/DeleteModal';
@@ -20,7 +20,7 @@ class App extends React.Component {
 
         // THIS WILL TALK TO LOCAL STORAGE
         this.db = new DBManager();
-
+        this.tps = new jsTPS();
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
 
@@ -150,6 +150,7 @@ class App extends React.Component {
         }), () => {
             // ANY AFTER EFFECTS?
             this.tps.clearAllTransactions();
+            console.log(this);
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
@@ -199,6 +200,24 @@ class App extends React.Component {
         });
     }
 
+    addMoveItemTransaction = (start,target) => {
+        if (start!==target) {
+            let transaction = new MoveItem_Transaction(this, start, target);
+            this.tps.addTransaction(transaction);
+        }
+    }
+
+    moveItem(start,target) {
+        let newCurrentList = this.state.currentList;
+        newCurrentList.items.splice(target, 0, newCurrentList.items.splice(start, 1)[0]);
+        this.setState(prevState => ({
+            currentList:newCurrentList,
+            sessionData:prevState.sessionData
+        }), () => {
+            this.db.mutationUpdateList(this.state.currentList);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
     showDeleteListModal() {
@@ -210,13 +229,18 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
+    canClose = () => {
+        return this.state.currentList!=null;
+    }
     
     render() {
         return (
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
-                    closeCallback={this.closeCurrentList} />
+                    closeCallback={this.closeCurrentList} 
+                    canCloseCallback = {this.canClose}
+                    />
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
@@ -229,7 +253,10 @@ class App extends React.Component {
                 <Workspace
                     currentList={this.state.currentList}
                     renameItemCallback={this.renameItem}
-                    moveItemCallback={this.moveItem} />
+                    moveItemCallback={this.moveItem} 
+                    addMoveItemTransactionCallback = {this.addMoveItemTransaction}
+                    addChangeItemTransactionCallback = {this.addChangeItemTransaction} 
+                    />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal

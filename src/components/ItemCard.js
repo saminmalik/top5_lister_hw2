@@ -59,7 +59,7 @@ export default class ItemCard extends React.Component {
 
 
     render() {
-
+        /*
         if (this.state.editActive) {
             return (
                 <input //change this stuff class name, id, default value
@@ -78,6 +78,34 @@ export default class ItemCard extends React.Component {
                     id={this.props.key}
                     key={this.props.name}
                     onClick={this.handleClick}
+                    className={'top5-item'}>
+                        {this.props.name}
+                </div>
+            );
+        }*/
+        if (this.state.editActive) {
+            return (
+                <input
+                id={"item-" + (this.props.index+1)}
+                    className="top5-item"
+                    type='text'
+                    onKeyPress={this.handleKeyPress}
+                    onBlur={this.handleBlur}
+                    onChange={this.handleUpdate}
+                    defaultValue={this.props.name}
+                />)
+        }
+        else {//if not being edited
+            return (
+                <div
+                id={"item-" + (this.props.index+1)}
+                    onClick={this.handleClick}
+                    draggable="true"
+                    onDragStart={this.handledragstart}
+                    onDragOver={this.handledragover}
+                    onDrop={this.handledrop}
+                    onDragEnter={this.handledragenter}
+                    onDragLeave={this.handledragleave}          
                     className={'top5-item'}>
                         {this.props.name}
                 </div>

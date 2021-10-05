@@ -1,4 +1,4 @@
-import jsTPS_Transaction from "../common/jsTPS.js"
+import jsTPS_Transaction from "../transaction/jsTPS.js"
 
 /**
  * ChangeItem_Transaction

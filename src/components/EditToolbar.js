@@ -2,7 +2,7 @@ import React from "react";
 
 export default class EditToolbar extends React.Component {
     render() {
-        const {closeCallback} = this.props;
+        const {closeCallback,canCloseCallback} = this.props;
         return (
             <div id="edit-toolbar">
                 <div 
@@ -17,9 +17,9 @@ export default class EditToolbar extends React.Component {
                 </div>
                 <div
                     id='close-button'
-                    className="top5-button">
-                        &#x24E7;
-                    onClick={closeCallback}
+                    className={`top5-button ${this.props.canCloseCallback() ? "" : "disabled"} `}
+                    onClick={this.props.closeCallback}>
+                    &#x24E7;
                 </div>
             </div>
         )
