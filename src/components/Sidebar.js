@@ -17,6 +17,7 @@ export default class Sidebar extends React.Component {
                     <input 
                         type="button" 
                         id="add-list-button" 
+                        style = {(this.props.currentList !==null) ? {opacity : 0.5} : {} }
                         onClick={createNewListCallback}
                         className="top5-button" 
                         value="+" />

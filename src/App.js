@@ -40,6 +40,9 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CREATING A NEW LIST
     createNewList = () => {
+        if (this.state.currentList === null){
+
+        
         // FIRST FIGURE OUT WHAT THE NEW LIST'S KEY AND NAME WILL BE
         let newKey = this.state.sessionData.nextKey;
         let newName = "Untitled" + newKey;
@@ -75,6 +78,7 @@ class App extends React.Component {
             // IS AN AFTER EFFECT
             this.db.mutationCreateList(newList);
         });
+        }
     }
     renameList = (key, newName) => {
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
@@ -145,19 +149,20 @@ class App extends React.Component {
             currentList: newCurrentList,
             sessionData: prevState.sessionData
         }), () => {
-
+            
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             currentList: null,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             sessionData: this.state.sessionData
         }), () => {
             // ANY AFTER EFFECTS?
-            this.tps.clearAllTransactions();
-            console.log(this);
+            
+            //document.getElementById('undo-button')
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
@@ -255,9 +260,7 @@ class App extends React.Component {
     hasRedo = () => {
         return this.tps.hasTransactionToRedo();
     }
-    canClose = () => {
-        return this.state.currentList!=null;
-    }
+    
     componentDidMount(){
         //window.onkeydown
         document.addEventListener('keydown',this.keydownHandle);
