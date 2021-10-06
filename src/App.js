@@ -109,6 +109,12 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+
+    addItemTranscation = (key, newName, prevName) => {
+        
+        let transaction = new ChangeItem_Transaction(this, key, newName,prevName);
+        this.tps.addTransaction(transaction);
+    }
     renameItem = (key, newName) => {
         let itemS = this.state.currentList.items;
         itemS[key] = newName;
@@ -119,6 +125,7 @@ class App extends React.Component {
             }
         }*/
         //
+        
         this.setState(prevState => ({
             //currentList: prevState.currentList,
                 currentList: prevState.currentList,
@@ -251,6 +258,20 @@ class App extends React.Component {
     canClose = () => {
         return this.state.currentList!=null;
     }
+    componentDidMount(){
+        //window.onkeydown
+        document.addEventListener('keydown',this.keydownHandle);
+    }
+    keydownHandle = (event)=>{
+        if(event.ctrlKey && event.key === 'z'){
+            this.undo();
+        
+    }  else if (event.ctrlKey && event.key === 'y'){
+        this.redo();
+    
+        }
+
+    }
     
     render() {
         return (
@@ -275,10 +296,10 @@ class App extends React.Component {
                 />
                 <Workspace
                     currentList={this.state.currentList}
-                    renameItemCallback={this.renameItem}
+                    renameItemCallback={this.addItemTranscation}
                     moveItemCallback={this.moveItem} 
                     addMoveItemTransactionCallback = {this.addMoveItemTransaction}
-                    addChangeItemTransactionCallback = {this.addChangeItemTransaction} 
+                    //addChangeItemTransactionCallback = {this.addChangeItemTransaction} 
                     />
                 <Statusbar 
                     currentList={this.state.currentList} />
